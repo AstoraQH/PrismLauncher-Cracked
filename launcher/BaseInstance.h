@@ -183,7 +183,7 @@ class BaseInstance : public QObject, public std::enable_shared_from_this<BaseIns
     virtual Task::Ptr createUpdateTask(Net::Mode mode) = 0;
 
     /// returns a valid launcher (task container)
-    virtual shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr account, MinecraftServerTargetPtr serverToJoin) = 0;
+    virtual shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr account, MinecraftServerTargetPtr serverToJoin, quint16 localAuthServerPort) = 0;
 
     /// returns the current launch task (if any)
     shared_qobject_ptr<LaunchTask> getLaunchTask();
