@@ -89,8 +89,7 @@ void LaunchController::decideAccount()
     if (accounts->count() <= 0 || !accounts->anyAccountIsValid()) {
         // Tell the user they need to log in at least one account in order to play.
         auto reply = CustomMessageBox::selectable(m_parentWidget, tr("No Accounts"),
-                                                  tr("In order to play Minecraft, you must have at least one Microsoft "
-                                                     "account which owns Minecraft logged in. "
+                                                  tr("There is no account yet. "
                                                      "Would you like to open the account manager to add an account now?"),
                                                   QMessageBox::Information, QMessageBox::Yes | QMessageBox::No)
                          ->exec();
@@ -135,8 +134,7 @@ bool LaunchController::askPlayDemo()
     QMessageBox box(m_parentWidget);
     box.setWindowTitle(tr("Play demo?"));
     box.setText(
-        tr("This account does not own Minecraft.\nYou need to purchase the game first to play it.\n\nDo you want to play "
-           "the demo?"));
+        tr("Do you want to play the demo?"));
     box.setIcon(QMessageBox::Warning);
     auto demoButton = box.addButton(tr("Play Demo"), QMessageBox::ButtonRole::YesRole);
     auto cancelButton = box.addButton(tr("Cancel"), QMessageBox::ButtonRole::NoRole);
@@ -265,7 +263,7 @@ void LaunchController::login()
                     if (m_session->demo) {  // play demo here
                         launchInstance();
                     } else {
-                        emitFailed(tr("Launch cancelled - account does not own Minecraft."));
+                        emitFailed(tr("Launch failed."));
                     }
                 }
                 return;
