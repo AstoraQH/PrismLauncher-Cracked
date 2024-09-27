@@ -115,6 +115,7 @@
 #include "tools/JProfiler.h"
 #include "tools/JVisualVM.h"
 #include "tools/MCEditTool.h"
+#include "AuthServer.h"
 
 #include "settings/INISettingsObject.h"
 #include "settings/Setting.h"
@@ -874,6 +875,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_metacache.reset(new HttpMetaCache("metacache"));
         m_metacache->addBase("asset_indexes", QDir("assets/indexes").absolutePath());
         m_metacache->addBase("libraries", QDir("libraries").absolutePath());
+        m_metacache->addBase("injectors", QDir("injectors").absolutePath());
         m_metacache->addBase("fmllibs", QDir("mods/minecraftforge/libs").absolutePath());
         m_metacache->addBase("general", QDir("cache").absolutePath());
         m_metacache->addBase("ATLauncherPacks", QDir("cache/ATLauncherPacks").absolutePath());
@@ -904,6 +906,11 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     // Create the MCEdit thing... why is this here?
     {
         m_mcedit.reset(new MCEditTool(m_settings));
+    }
+
+    {
+        m_authserver.reset(new AuthServer(this));
+        qDebug() << "<> Auth server started.";
     }
 
 #ifdef Q_OS_MACOS
@@ -1390,6 +1397,7 @@ bool Application::launch(InstancePtr instance, bool online, bool demo, Minecraft
         controller->setProfiler(profilers().value(instance->settings()->get("Profiler").toString(), nullptr).get());
         controller->setTargetToJoin(targetToJoin);
         controller->setAccountToUse(accountToUse);
+        controller->setAuthserver(m_authserver);
         if (window) {
             controller->setParentWidget(window);
         } else if (m_mainWindow) {
