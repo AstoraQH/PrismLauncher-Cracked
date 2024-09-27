@@ -94,6 +94,10 @@ set(CORE_SOURCES
     MMCTime.cpp
 
     MTPixmapCache.h
+
+    # Local Auth server
+    AuthServer.h
+    AuthServer.cpp
 )
 if (UNIX AND NOT CYGWIN AND NOT APPLE)
 set(CORE_SOURCES
@@ -281,6 +285,8 @@ set(MINECRAFT_SOURCES
     minecraft/launch/VerifyJavaInstall.h
     minecraft/launch/AutoInstallJava.cpp
     minecraft/launch/AutoInstallJava.h
+    minecraft/launch/InjectAuthlib.cpp
+    minecraft/launch/InjectAuthlib.h
 
     minecraft/GradleSpecifier.h
     minecraft/MinecraftInstance.cpp
