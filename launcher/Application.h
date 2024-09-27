@@ -69,6 +69,7 @@ class BaseDetachedToolFactory;
 class TranslationsModel;
 class ITheme;
 class MCEditTool;
+class AuthServer;
 class ThemeManager;
 class IconTheme;
 
@@ -246,6 +247,7 @@ class Application : public QApplication {
     std::shared_ptr<TranslationsModel> m_translations;
     std::shared_ptr<GenericPageProvider> m_globalSettingsProvider;
     std::unique_ptr<MCEditTool> m_mcedit;
+    std::shared_ptr<AuthServer> m_authserver;
     QSet<QString> m_features;
     std::unique_ptr<ThemeManager> m_themeManager;
 
