@@ -1112,11 +1112,15 @@ shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPt
     }
 
     // authlib patch
-    if (session->user_type == "offline" && session->status != AuthSession::PlayableOffline)
-    {
+    {    
         auto step = makeShared<InjectAuthlib>(pptr, &m_injector);
         step->setAuthServer(((QString)"http://localhost:%1").arg(localAuthServerPort));
-        process->appendStep(step);
+
+        if (session->user_type == "offline" && session->status != AuthSession::PlayableOffline) {
+            process->appendStep(step);
+        } else {
+            m_injector.reset();
+        }
     }
 
     // verify that minimum Java requirements are met
