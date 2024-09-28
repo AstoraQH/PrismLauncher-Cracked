@@ -6,6 +6,8 @@ project(application)
 
 set(CORE_SOURCES
     # LOGIC - Base classes and infrastructure
+    AuthServer.h
+    AuthServer.cpp
     BaseInstaller.h
     BaseInstaller.cpp
     BaseVersionList.h
@@ -281,6 +283,8 @@ set(MINECRAFT_SOURCES
     minecraft/launch/ScanModFolders.h
     minecraft/launch/VerifyJavaInstall.cpp
     minecraft/launch/VerifyJavaInstall.h
+    minecraft/launch/InjectAuthlib.cpp
+    minecraft/launch/InjectAuthlib.h
 
     minecraft/GradleSpecifier.h
     minecraft/MinecraftInstance.cpp

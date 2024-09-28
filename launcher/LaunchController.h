@@ -40,6 +40,7 @@
 
 #include "minecraft/auth/MinecraftAccount.h"
 #include "minecraft/launch/MinecraftServerTarget.h"
+#include "AuthServer.h"
 
 class InstanceWindow;
 class LaunchController : public Task {
@@ -65,6 +66,8 @@ class LaunchController : public Task {
     void setServerToJoin(MinecraftServerTargetPtr serverToJoin) { m_serverToJoin = std::move(serverToJoin); }
 
     void setAccountToUse(MinecraftAccountPtr accountToUse) { m_accountToUse = std::move(accountToUse); }
+    
+    void setAuthserver(std::shared_ptr<AuthServer> authserver) { m_authserver = authserver; }
 
     QString id() { return m_instance->id(); }
 
@@ -93,4 +96,5 @@ class LaunchController : public Task {
     AuthSessionPtr m_session;
     shared_qobject_ptr<LaunchTask> m_launcher;
     MinecraftServerTargetPtr m_serverToJoin;
+    std::shared_ptr<AuthServer> m_authserver;
 };
