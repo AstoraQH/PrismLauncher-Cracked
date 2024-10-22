@@ -69,6 +69,7 @@
 #include "minecraft/launch/ModMinecraftJar.h"
 #include "minecraft/launch/ReconstructAssets.h"
 #include "minecraft/launch/ScanModFolders.h"
+#include "minecraft/launch/InjectAuthlib.h"
 #include "minecraft/launch/VerifyJavaInstall.h"
 
 #include "java/JavaUtils.h"
@@ -523,6 +524,11 @@ QStringList MinecraftInstance::javaArguments()
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
         // allow reflective access to java.net - required by the skin fix
         args << "--add-opens" << "java.base/java.net=ALL-UNNAMED";
+
+    if (m_injector) {
+        args << m_injector->javaArg;
+        args << "-Dauthlibinjector.noShowServerName";
+    }
 
     return args;
 }
@@ -1044,7 +1050,7 @@ QList<LaunchStep::Ptr> MinecraftInstance::createUpdateTask()
     };
 }
 
-shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin)
+shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort)
 {
     updateRuntimeContext();
     // FIXME: get rid of shared_from_this ...
@@ -1135,6 +1141,18 @@ shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPt
     // reconstruct assets if needed
     {
         process->appendStep(makeShared<ReconstructAssets>(pptr));
+    }
+
+    // authlib patch
+    {    
+        auto step = makeShared<InjectAuthlib>(pptr, &m_injector);
+        step->setAuthServer(((QString)"http://localhost:%1").arg(localAuthServerPort));
+
+        if (session->user_type == "offline" && session->status != AuthSession::PlayableOffline) {
+            process->appendStep(step);
+        } else {
+            m_injector.reset();
+        }
     }
 
     // verify that minimum Java requirements are met

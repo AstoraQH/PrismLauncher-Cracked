@@ -41,6 +41,7 @@
 #include "BaseInstance.h"
 #include "minecraft/launch/MinecraftTarget.h"
 #include "minecraft/mod/Mod.h"
+#include "minecraft/launch/InjectAuthlib.h"
 
 class ModFolderModel;
 class ResourceFolderModel;
@@ -121,7 +122,7 @@ class MinecraftInstance : public BaseInstance {
 
     //////  Launch stuff //////
     QList<Task::Ptr> createUpdateTask() override;
-    shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) override;
+    shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort) override;
     QStringList extraArguments() override;
     QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
     QList<Mod*> getJarMods() const;
@@ -172,6 +173,7 @@ class MinecraftInstance : public BaseInstance {
     mutable std::shared_ptr<TexturePackFolderModel> m_texture_pack_list;
     mutable std::shared_ptr<WorldList> m_world_list;
     mutable std::shared_ptr<GameOptions> m_game_options;
+    mutable std::shared_ptr<AuthlibInjector> m_injector;
 };
 
 using MinecraftInstancePtr = std::shared_ptr<MinecraftInstance>;
