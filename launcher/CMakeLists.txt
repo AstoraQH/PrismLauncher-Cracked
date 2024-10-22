@@ -612,7 +612,7 @@ set(PRISMUPDATER_SOURCES
     updater/prismupdater/UpdaterDialogs.cpp
     updater/prismupdater/GitHubRelease.h
     updater/prismupdater/GitHubRelease.cpp
-   
+
     Json.h
     Json.cpp
     FileSystem.h
@@ -629,7 +629,7 @@ set(PRISMUPDATER_SOURCES
     # Zip
     MMCZip.h
     MMCZip.cpp
-    
+
     # Time
     MMCTime.h
     MMCTime.cpp
@@ -969,6 +969,9 @@ SET(LAUNCHER_SOURCES
     ui/pages/modplatform/ShaderPackPage.cpp
     ui/pages/modplatform/ShaderPackModel.cpp
 
+
+    ui/pages/modplatform/ModpackProviderBasePage.h
+
     ui/pages/modplatform/atlauncher/AtlFilterModel.cpp
     ui/pages/modplatform/atlauncher/AtlFilterModel.h
     ui/pages/modplatform/atlauncher/AtlListModel.cpp
@@ -1266,14 +1269,10 @@ include(CompilerWarnings)
 
 # Add executable
 add_library(Launcher_logic STATIC ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${LAUNCHER_UI} ${LAUNCHER_RESOURCES})
-if(BUILD_TESTING)
-target_compile_definitions(Launcher_logic PUBLIC LAUNCHER_TEST)
-endif()
 set_project_warnings(Launcher_logic
     "${Launcher_MSVC_WARNINGS}"
     "${Launcher_CLANG_WARNINGS}"
     "${Launcher_GCC_WARNINGS}")
-target_compile_definitions(Launcher_logic PUBLIC LAUNCHER_APPLICATION)
 target_include_directories(Launcher_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(Launcher_logic PUBLIC LAUNCHER_APPLICATION)
 target_link_libraries(Launcher_logic
@@ -1377,7 +1376,7 @@ if(Launcher_BUILD_UPDATER)
     add_executable("${Launcher_Name}_updater" WIN32 updater/prismupdater/updater_main.cpp)
     target_sources("${Launcher_Name}_updater" PRIVATE updater/prismupdater/updater.exe.manifest)
     target_link_libraries("${Launcher_Name}_updater" prism_updater_logic)
-    
+
     if(DEFINED Launcher_APP_BINARY_NAME)
         set_target_properties("${Launcher_Name}_updater" PROPERTIES OUTPUT_NAME "${Launcher_APP_BINARY_NAME}_updater")
     endif()

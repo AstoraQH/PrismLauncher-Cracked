@@ -1032,7 +1032,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     }
 
     // notify user if /tmp is mounted with `noexec` (#1693)
-    {
+    QString jvmArgs = m_settings->get("JvmArgs").toString();
+    if (jvmArgs.indexOf("java.io.tmpdir") == -1) { /* java.io.tmpdir is a valid workaround, so don't annoy */
         bool is_tmp_noexec = false;
 
 #if defined(Q_OS_LINUX)
@@ -1052,7 +1053,11 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         if (is_tmp_noexec) {
             auto infoMsg =
                 tr("Your /tmp directory is currently mounted with the 'noexec' flag enabled.\n"
-                   "Some versions of Minecraft may not launch.\n");
+                   "Some versions of Minecraft may not launch.\n"
+                   "\n"
+                   "You may solve this issue by remounting /tmp as 'exec' or setting "
+                   "the java.io.tmpdir JVM argument to a writeable directory in a "
+                   "filesystem where the 'exec' flag is set (e.g., /home/user/.local/tmp)\n");
             auto msgBox = new QMessageBox(QMessageBox::Information, tr("Incompatible system configuration"), infoMsg, QMessageBox::Ok);
             msgBox->setDefaultButton(QMessageBox::Ok);
             msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -1073,6 +1078,9 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 bool Application::createSetupWizard()
 {
     bool javaRequired = [&]() {
+        if (BuildConfig.JAVA_DOWNLOADER_ENABLED && m_settings->get("AutomaticJavaDownload").toBool()) {
+            return false;
+        }
         bool ignoreJavaWizard = m_settings->get("IgnoreJavaWizard").toBool();
         if (ignoreJavaWizard) {
             return false;
@@ -1085,10 +1093,7 @@ bool Application::createSetupWizard()
         }
         QString currentJavaPath = settings()->get("JavaPath").toString();
         QString actualPath = FS::ResolveExecutable(currentJavaPath);
-        if (actualPath.isNull()) {
-            return true;
-        }
-        return false;
+        return actualPath.isNull();
     }();
     bool askjava = BuildConfig.JAVA_DOWNLOADER_ENABLED && !javaRequired && !m_settings->get("AutomaticJavaDownload").toBool() &&
                    !m_settings->get("AutomaticJavaSwitch").toBool() && !m_settings->get("UserAskedAboutAutomaticJavaDownload").toBool();
