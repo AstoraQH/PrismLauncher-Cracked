@@ -39,9 +39,9 @@
 #include <QDir>
 #include <QProcess>
 #include "BaseInstance.h"
+#include "minecraft/launch/InjectAuthlib.h"
 #include "minecraft/launch/MinecraftTarget.h"
 #include "minecraft/mod/Mod.h"
-#include "minecraft/launch/InjectAuthlib.h"
 
 class ModFolderModel;
 class ResourceFolderModel;
@@ -122,7 +122,9 @@ class MinecraftInstance : public BaseInstance {
 
     //////  Launch stuff //////
     QList<Task::Ptr> createUpdateTask() override;
-    shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort) override;
+    shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr account,
+                                                    MinecraftTarget::Ptr targetToJoin,
+                                                    quint16 localAuthServerPort) override;
     QStringList extraArguments() override;
     QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
     QList<Mod*> getJarMods() const;

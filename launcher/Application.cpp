@@ -112,10 +112,10 @@
 
 #include "updater/ExternalUpdater.h"
 
+#include "AuthServer.h"
 #include "tools/JProfiler.h"
 #include "tools/JVisualVM.h"
 #include "tools/MCEditTool.h"
-#include "AuthServer.h"
 
 #include "settings/INISettingsObject.h"
 #include "settings/Setting.h"
