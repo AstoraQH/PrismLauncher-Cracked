@@ -52,7 +52,10 @@ class NullInstance : public BaseInstance {
     QString getStatusbarDescription() override { return tr("Unknown instance type"); };
     QSet<QString> traits() const override { return {}; };
     QString instanceConfigFolder() const override { return instanceRoot(); };
-    shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr, MinecraftTarget::Ptr, quint16 localAuthServerPort) override { return nullptr; }
+    shared_qobject_ptr<LaunchTask> createLaunchTask(AuthSessionPtr, MinecraftTarget::Ptr, quint16 localAuthServerPort) override
+    {
+        return nullptr;
+    }
     QList<Task::Ptr> createUpdateTask() override { return {}; }
     QProcessEnvironment createEnvironment() override { return QProcessEnvironment(); }
     QProcessEnvironment createLaunchEnvironment() override { return QProcessEnvironment(); }

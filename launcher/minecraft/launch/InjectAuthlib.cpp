@@ -1,20 +1,20 @@
 #include "InjectAuthlib.h"
+#include <Application.h>
+#include <FileSystem.h>
+#include <Json.h>
 #include <launch/LaunchTask.h>
 #include <minecraft/MinecraftInstance.h>
-#include <FileSystem.h>
-#include <Application.h>
-#include <Json.h>
 #include <net/ApiDownload.h>
 
-InjectAuthlib::InjectAuthlib(LaunchTask *parent, AuthlibInjectorPtr* injector) : LaunchStep(parent)
+
+InjectAuthlib::InjectAuthlib(LaunchTask* parent, AuthlibInjectorPtr* injector) : LaunchStep(parent)
 {
     m_injector = injector;
 }
 
 void InjectAuthlib::executeTask()
 {
-    if (m_aborted)
-    {
+    if (m_aborted) {
         emitFailed(tr("Task aborted."));
         return;
     }
@@ -22,8 +22,7 @@ void InjectAuthlib::executeTask()
     auto latestVersionInfo = QString("https://authlib-injector.yushi.moe/artifact/latest.json");
     auto netJob = makeShared<NetJob>("Injector versions info download", APPLICATION->network());
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("injectors", "version.json");
-    if (!m_offlineMode)
-    {
+    if (!m_offlineMode) {
         entry->setStale(true);
         auto task = Net::ApiDownload::makeCached(QUrl(latestVersionInfo), entry);
         netJob->addNetAction(task);
@@ -32,23 +31,17 @@ void InjectAuthlib::executeTask()
         QObject::connect(netJob.get(), &NetJob::succeeded, this, &InjectAuthlib::onVersionDownloadSucceeded);
         QObject::connect(netJob.get(), &NetJob::failed, this, &InjectAuthlib::onDownloadFailed);
         jobPtr->start();
-    }
-    else
-    {
+    } else {
         onVersionDownloadSucceeded();
     }
 }
 
 void InjectAuthlib::onVersionDownloadSucceeded()
 {
-
     QByteArray data;
-    try
-    {
+    try {
         data = FS::read(QDir("injectors").absoluteFilePath("version.json"));
-    }
-    catch (const Exception &e)
-    {
+    } catch (const Exception& e) {
         qCritical() << "Translations Download Failed: index file not readable";
         jobPtr.reset();
         emitFailed("Error while parsing JSON response from InjectorEndpoint");
@@ -57,17 +50,16 @@ void InjectAuthlib::onVersionDownloadSucceeded()
 
     QJsonParseError parse_error;
     QJsonDocument doc = QJsonDocument::fromJson(data, &parse_error);
-    if (parse_error.error != QJsonParseError::NoError)
-    {
-        qCritical() << "Error while parsing JSON response from InjectorEndpoint at " << parse_error.offset << " reason: " << parse_error.errorString();
+    if (parse_error.error != QJsonParseError::NoError) {
+        qCritical() << "Error while parsing JSON response from InjectorEndpoint at " << parse_error.offset
+                    << " reason: " << parse_error.errorString();
         qCritical() << data;
         jobPtr.reset();
         emitFailed("Error while parsing JSON response from InjectorEndpoint");
         return;
     }
 
-    if (!doc.isObject())
-    {
+    if (!doc.isObject()) {
         qCritical() << "Error while parsing JSON response from InjectorEndpoint root is not object";
         qCritical() << data;
         jobPtr.reset();
@@ -76,12 +68,9 @@ void InjectAuthlib::onVersionDownloadSucceeded()
     }
 
     QString downloadUrl;
-    try
-    {
+    try {
         downloadUrl = Json::requireString(doc.object(), "download_url");
-    }
-    catch (const JSONValidationError &e)
-    {
+    } catch (const JSONValidationError& e) {
         qCritical() << "Error while parsing JSON response from InjectorEndpoint download url is not string";
         qCritical() << e.cause();
         qCritical() << data;
@@ -94,8 +83,7 @@ void InjectAuthlib::onVersionDownloadSucceeded()
     m_versionName = fi.fileName();
 
     qDebug() << "Authlib injector version:" << m_versionName;
-    if (!m_offlineMode)
-    {
+    if (!m_offlineMode) {
         auto netJob = makeShared<NetJob>("Injector download", APPLICATION->network());
         MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("injectors", m_versionName);
         entry->setStale(true);
@@ -106,9 +94,7 @@ void InjectAuthlib::onVersionDownloadSucceeded()
         QObject::connect(netJob.get(), &NetJob::succeeded, this, &InjectAuthlib::onDownloadSucceeded);
         QObject::connect(netJob.get(), &NetJob::failed, this, &InjectAuthlib::onDownloadFailed);
         jobPtr->start();
-    }
-    else
-    {
+    } else {
         onDownloadSucceeded();
     }
 }
@@ -117,8 +103,7 @@ void InjectAuthlib::onDownloadSucceeded()
 {
     QString injector = QString("-javaagent:%1=%2").arg(QDir("injectors").absoluteFilePath(m_versionName)).arg(m_authServer);
 
-    qDebug()
-        << "Injecting " << injector;
+    qDebug() << "Injecting " << injector;
     auto inj = new AuthlibInjector(injector);
     m_injector->reset(inj);
 
@@ -132,14 +117,11 @@ void InjectAuthlib::onDownloadFailed(QString reason)
     emitFailed(reason);
 }
 
-void InjectAuthlib::proceed()
-{
-}
+void InjectAuthlib::proceed() {}
 
 bool InjectAuthlib::canAbort() const
 {
-    if (jobPtr)
-    {
+    if (jobPtr) {
         return jobPtr->canAbort();
     }
     return true;
@@ -148,10 +130,8 @@ bool InjectAuthlib::canAbort() const
 bool InjectAuthlib::abort()
 {
     m_aborted = true;
-    if (jobPtr)
-    {
-        if (jobPtr->canAbort())
-        {
+    if (jobPtr) {
+        if (jobPtr->canAbort()) {
             return jobPtr->abort();
         }
     }

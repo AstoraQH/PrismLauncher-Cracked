@@ -112,10 +112,10 @@
 
 #include "updater/ExternalUpdater.h"
 
+#include "AuthServer.h"
 #include "tools/JProfiler.h"
 #include "tools/JVisualVM.h"
 #include "tools/MCEditTool.h"
-#include "AuthServer.h"
 
 #include "settings/INISettingsObject.h"
 #include "settings/Setting.h"
@@ -972,7 +972,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
                     [[fallthrough]];
                 default: {
                     qDebug() << "Exiting because update lockfile is present";
-                    QMetaObject::invokeMethod(this, []() { exit(1); }, Qt::QueuedConnection);
+                    QMetaObject::invokeMethod(
+                        this, []() { exit(1); }, Qt::QueuedConnection);
                     return;
                 }
             }
@@ -1004,7 +1005,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
                     [[fallthrough]];
                 default: {
                     qDebug() << "Exiting because update lockfile is present";
-                    QMetaObject::invokeMethod(this, []() { exit(1); }, Qt::QueuedConnection);
+                    QMetaObject::invokeMethod(
+                        this, []() { exit(1); }, Qt::QueuedConnection);
                     return;
                 }
             }
@@ -1714,7 +1716,8 @@ QString Application::getJarPath(QString jarFile)
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
         FS::PathCombine(m_rootPath, "share", BuildConfig.LAUNCHER_NAME),
 #endif
-        FS::PathCombine(m_rootPath, "jars"), FS::PathCombine(applicationDirPath(), "jars"),
+        FS::PathCombine(m_rootPath, "jars"),
+        FS::PathCombine(applicationDirPath(), "jars"),
         FS::PathCombine(applicationDirPath(), "..", "jars")  // from inside build dir, for debuging
     };
     for (QString p : potentialPaths) {
