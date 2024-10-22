@@ -133,8 +133,7 @@ bool LaunchController::askPlayDemo()
 {
     QMessageBox box(m_parentWidget);
     box.setWindowTitle(tr("Play demo?"));
-    box.setText(
-        tr("Do you want to play the demo?"));
+    box.setText(tr("Do you want to play the demo?"));
     box.setIcon(QMessageBox::Warning);
     auto demoButton = box.addButton(tr("Play Demo"), QMessageBox::ButtonRole::YesRole);
     auto cancelButton = box.addButton(tr("Cancel"), QMessageBox::ButtonRole::NoRole);
