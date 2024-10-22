@@ -65,11 +65,11 @@
 #include "launch/steps/TextPrint.h"
 
 #include "minecraft/launch/ClaimAccount.h"
+#include "minecraft/launch/InjectAuthlib.h"
 #include "minecraft/launch/LauncherPartLaunch.h"
 #include "minecraft/launch/ModMinecraftJar.h"
 #include "minecraft/launch/ReconstructAssets.h"
 #include "minecraft/launch/ScanModFolders.h"
-#include "minecraft/launch/InjectAuthlib.h"
 #include "minecraft/launch/VerifyJavaInstall.h"
 
 #include "java/JavaUtils.h"
@@ -523,7 +523,8 @@ QStringList MinecraftInstance::javaArguments()
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
         // allow reflective access to java.net - required by the skin fix
-        args << "--add-opens" << "java.base/java.net=ALL-UNNAMED";
+        args << "--add-opens"
+             << "java.base/java.net=ALL-UNNAMED";
 
     if (m_injector) {
         args << m_injector->javaArg;
@@ -802,8 +803,10 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
 QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin)
 {
     QStringList out;
-    out << "Main Class:" << "  " + getMainClass() << "";
-    out << "Native path:" << "  " + getNativePath() << "";
+    out << "Main Class:"
+        << "  " + getMainClass() << "";
+    out << "Native path:"
+        << "  " + getNativePath() << "";
 
     auto profile = m_components->getProfile();
 
@@ -1050,7 +1053,9 @@ QList<LaunchStep::Ptr> MinecraftInstance::createUpdateTask()
     };
 }
 
-shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort)
+shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPtr session,
+                                                                   MinecraftTarget::Ptr targetToJoin,
+                                                                   quint16 localAuthServerPort)
 {
     updateRuntimeContext();
     // FIXME: get rid of shared_from_this ...
@@ -1144,9 +1149,9 @@ shared_qobject_ptr<LaunchTask> MinecraftInstance::createLaunchTask(AuthSessionPt
     }
 
     // authlib patch
-    {    
+    {
         auto step = makeShared<InjectAuthlib>(pptr, &m_injector);
-        step->setAuthServer(((QString)"http://localhost:%1").arg(localAuthServerPort));
+        step->setAuthServer(((QString) "http://localhost:%1").arg(localAuthServerPort));
 
         if (session->user_type == "offline" && session->status != AuthSession::PlayableOffline) {
             process->appendStep(step);
