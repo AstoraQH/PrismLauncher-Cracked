@@ -40,6 +40,7 @@
 #include <QDir>
 #include <QProcess>
 #include "BaseInstance.h"
+#include "minecraft/launch/InjectAuthlib.h"
 #include "minecraft/launch/MinecraftTarget.h"
 #include "minecraft/mod/Mod.h"
 
@@ -124,7 +125,9 @@ class MinecraftInstance : public BaseInstance {
 
     //////  Launch stuff //////
     QList<Task::Ptr> createUpdateTask() override;
-    LaunchTask* createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) override;
+    LaunchTask* createLaunchTask(AuthSessionPtr account,
+                                                    MinecraftTarget::Ptr targetToJoin,
+                                                    quint16 localAuthServerPort) override;
     QStringList extraArguments() override;
     QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
     QList<Mod*> getJarMods() const;
@@ -171,4 +174,5 @@ class MinecraftInstance : public BaseInstance {
     std::unique_ptr<TexturePackFolderModel> m_texture_pack_list;
     std::unique_ptr<DataPackFolderModel> m_data_pack_list;
     std::unique_ptr<WorldList> m_world_list;
+    std::shared_ptr<AuthlibInjector> m_injector;
 };

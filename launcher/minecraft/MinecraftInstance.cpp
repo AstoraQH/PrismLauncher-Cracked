@@ -62,6 +62,7 @@
 #include "minecraft/launch/EnsureAvailableMemory.h"
 #include "minecraft/launch/EnsureOfflineLibraries.h"
 #include "minecraft/launch/ExtractNatives.h"
+#include "minecraft/launch/InjectAuthlib.h"
 #include "minecraft/launch/LauncherPartLaunch.h"
 #include "minecraft/launch/ModMinecraftJar.h"
 #include "minecraft/launch/PrintInstanceInfo.h"
@@ -628,7 +629,13 @@ QStringList MinecraftInstance::javaArguments()
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
         // allow reflective access to java.net - required by the skin fix
-        args << "--add-opens" << "java.base/java.net=ALL-UNNAMED";
+        args << "--add-opens"
+             << "java.base/java.net=ALL-UNNAMED";
+
+    if (m_injector) {
+        args << m_injector->javaArg;
+        args << "-Dauthlibinjector.noShowServerName";
+    }
 
     return args;
 }
@@ -1123,7 +1130,9 @@ QList<LaunchStep::Ptr> MinecraftInstance::createUpdateTask()
     };
 }
 
-LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin)
+LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session,
+                                                                   MinecraftTarget::Ptr targetToJoin,
+                                                                   quint16 localAuthServerPort)
 {
     updateRuntimeContext();
     auto process = LaunchTask::create(this);
@@ -1220,6 +1229,23 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
     // reconstruct assets if needed
     {
         process->appendStep(makeShared<ReconstructAssets>(pptr));
+    }
+
+    // authlib patch
+    {
+        auto step = makeShared<InjectAuthlib>(pptr, &m_injector);
+        step->setAuthServer(((QString) "http://localhost:%1").arg(localAuthServerPort));
+
+        if (session->user_type == "offline" && session->status != AuthSession::PlayableOffline) {
+            process->appendStep(step);
+        } else {
+            m_injector.reset();
+        }
+    }
+
+    // verify that minimum Java requirements are met
+    {
+        process->appendStep(makeShared<VerifyJavaInstall>(pptr));
     }
 
     {

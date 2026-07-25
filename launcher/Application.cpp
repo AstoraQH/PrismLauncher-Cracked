@@ -111,6 +111,7 @@
 
 #include "updater/ExternalUpdater.h"
 
+#include "AuthServer.h"
 #include "tools/JProfiler.h"
 #include "tools/JVisualVM.h"
 #include "tools/MCEditTool.h"
@@ -996,6 +997,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_metacache.reset(new HttpMetaCache("metacache"));
         m_metacache->addBase("asset_indexes", QDir("assets/indexes").absolutePath());
         m_metacache->addBase("libraries", QDir("libraries").absolutePath());
+        m_metacache->addBase("injectors", QDir("injectors").absolutePath());
         m_metacache->addBase("fmllibs", QDir("mods/minecraftforge/libs").absolutePath());
         m_metacache->addBase("general", QDir("cache").absolutePath());
         m_metacache->addBase("ATLauncherPacks", QDir("cache/ATLauncherPacks").absolutePath());
@@ -1032,6 +1034,11 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     // Create the MCEdit thing... why is this here?
     {
         m_mcedit.reset(new MCEditTool(m_settings.get()));
+    }
+
+    {
+        m_authserver.reset(new AuthServer(this));
+        qDebug() << "<> Auth server started.";
     }
 
 #ifdef Q_OS_MACOS
@@ -1093,7 +1100,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
                     [[fallthrough]];
                 default: {
                     qDebug() << "Exiting because update lockfile is present";
-                    QMetaObject::invokeMethod(this, []() { exit(1); }, Qt::QueuedConnection);
+                    QMetaObject::invokeMethod(
+                        this, []() { exit(1); }, Qt::QueuedConnection);
                     return;
                 }
             }
@@ -1125,7 +1133,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
                     [[fallthrough]];
                 default: {
                     qDebug() << "Exiting because update lockfile is present";
-                    QMetaObject::invokeMethod(this, []() { exit(1); }, Qt::QueuedConnection);
+                    QMetaObject::invokeMethod(
+                        this, []() { exit(1); }, Qt::QueuedConnection);
                     return;
                 }
             }
@@ -1538,6 +1547,7 @@ bool Application::launch(BaseInstance* instance,
         controller->setTargetToJoin(targetToJoin);
         controller->setAccountToUse(accountToUse);
         controller->setOfflineName(offlineName);
+        controller->setAuthserver(m_authserver);
         if (window) {
             controller->setParentWidget(window);
         } else if (m_mainWindow) {
@@ -1857,7 +1867,8 @@ QString Application::getJarPath(QString jarFile)
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
         FS::PathCombine(m_rootPath, "share", BuildConfig.LAUNCHER_NAME),
 #endif
-        FS::PathCombine(m_rootPath, "jars"), FS::PathCombine(applicationDirPath(), "jars"),
+        FS::PathCombine(m_rootPath, "jars"),
+        FS::PathCombine(applicationDirPath(), "jars"),
         FS::PathCombine(applicationDirPath(), "..", "jars")  // from inside build dir, for debuging
     };
     for (QString p : potentialPaths) {

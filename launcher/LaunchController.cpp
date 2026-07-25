@@ -95,8 +95,7 @@ void LaunchController::decideAccount()
     if (!accounts->anyAccountIsValid()) {
         // Tell the user they need to log in at least one account in order to play.
         auto reply = CustomMessageBox::selectable(m_parentWidget, tr("No Accounts"),
-                                                  tr("In order to play Minecraft, you must have at least one Microsoft "
-                                                     "account which owns Minecraft logged in. "
+                                                  tr("There is no account yet. "
                                                      "Would you like to open the account manager to add an account now?"),
                                                   QMessageBox::Information, QMessageBox::Yes | QMessageBox::No)
                          ->exec();
@@ -212,11 +211,7 @@ bool LaunchController::askPlayDemo() const
 {
     QMessageBox box(m_parentWidget);
     box.setWindowTitle(tr("Play demo?"));
-    QString text = m_accountToUse
-                       ? tr("This account does not own Minecraft.\nYou need to purchase the game first to play the full version.")
-                       : tr("No account was selected for launch.");
-    text += tr("\n\nDo you want to play the demo?");
-    box.setText(text);
+    box.setText(tr("Do you want to play the demo?"));
     box.setIcon(QMessageBox::Warning);
     const auto* demoButton = box.addButton(tr("Play Demo"), QMessageBox::ButtonRole::YesRole);
     auto* cancelButton = box.addButton(tr("Cancel"), QMessageBox::ButtonRole::NoRole);
@@ -325,6 +320,16 @@ void LaunchController::login()
                 if (!ok) {
                     emitAborted();
                     return;
+                } else {
+                    // play demo ?
+                    if (!m_session->demo) {
+                        m_session->demo = askPlayDemo();
+                    }
+                    if (m_session->demo) {  // play demo here
+                        launchInstance();
+                    } else {
+                        emitFailed(tr("Launch failed."));
+                    }
                 }
             }
             m_session->MakeOffline(name);
@@ -376,7 +381,7 @@ void LaunchController::launchInstance()
         return;
     }
 
-    m_launcher = m_instance->createLaunchTask(m_session, m_targetToJoin);
+    m_launcher = m_instance->createLaunchTask(m_session, m_targetToJoin, m_authserver->port());
     if (!m_launcher) {
         emitFailed(tr("Couldn't instantiate a launcher."));
         return;
