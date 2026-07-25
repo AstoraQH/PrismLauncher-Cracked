@@ -320,16 +320,6 @@ void LaunchController::login()
                 if (!ok) {
                     emitAborted();
                     return;
-                } else {
-                    // play demo ?
-                    if (!m_session->demo) {
-                        m_session->demo = askPlayDemo();
-                    }
-                    if (m_session->demo) {  // play demo here
-                        launchInstance();
-                    } else {
-                        emitFailed(tr("Launch failed."));
-                    }
                 }
             }
             m_session->MakeOffline(name);
