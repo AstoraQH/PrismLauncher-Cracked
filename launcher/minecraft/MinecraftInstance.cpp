@@ -1233,7 +1233,7 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
         auto step = makeShared<InjectAuthlib>(pptr, &m_injector);
         step->setAuthServer(((QString) "http://localhost:%1").arg(localAuthServerPort));
 
-        if (session->launchMode == LaunchMode::Offline) {
+        if (session->user_type == "offline" && session->launchMode == LaunchMode::Normal) {
             process->appendStep(step);
         } else {
             m_injector.reset();
