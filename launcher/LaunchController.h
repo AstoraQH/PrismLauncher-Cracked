@@ -70,7 +70,7 @@ class LaunchController : public Task {
     void setAccountToUse(MinecraftAccountPtr accountToUse) { m_accountToUse = std::move(accountToUse); }
 
     void setAuthserver(std::shared_ptr<AuthServer> authserver) { m_authserver = authserver; }
-    
+
     QString id() const { return m_instance->id(); }
 
     bool abort() override;

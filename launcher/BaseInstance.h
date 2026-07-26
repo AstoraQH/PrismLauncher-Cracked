@@ -201,9 +201,7 @@ class BaseInstance : public QObject {
     virtual QList<Task::Ptr> createUpdateTask() = 0;
 
     /// returns a valid launcher (task container)
-    virtual LaunchTask*createLaunchTask(AuthSessionPtr account,
-                                                            MinecraftTarget::Ptr targetToJoin,
-                                                            quint16 localAuthServerPort) = 0;
+    virtual LaunchTask* createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort) = 0;
 
     /// returns the current launch task (if any)
     LaunchTask* getLaunchTask();

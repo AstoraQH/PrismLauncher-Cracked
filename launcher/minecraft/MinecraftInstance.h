@@ -125,9 +125,7 @@ class MinecraftInstance : public BaseInstance {
 
     //////  Launch stuff //////
     QList<Task::Ptr> createUpdateTask() override;
-    LaunchTask* createLaunchTask(AuthSessionPtr account,
-                                                    MinecraftTarget::Ptr targetToJoin,
-                                                    quint16 localAuthServerPort) override;
+    LaunchTask* createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort) override;
     QStringList extraArguments() override;
     QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
     QList<Mod*> getJarMods() const;

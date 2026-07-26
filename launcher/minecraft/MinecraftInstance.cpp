@@ -629,8 +629,7 @@ QStringList MinecraftInstance::javaArguments()
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
         // allow reflective access to java.net - required by the skin fix
-        args << "--add-opens"
-             << "java.base/java.net=ALL-UNNAMED";
+        args << "--add-opens" << "java.base/java.net=ALL-UNNAMED";
 
     if (m_injector) {
         args << m_injector->javaArg;
@@ -1130,9 +1129,7 @@ QList<LaunchStep::Ptr> MinecraftInstance::createUpdateTask()
     };
 }
 
-LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session,
-                                                                   MinecraftTarget::Ptr targetToJoin,
-                                                                   quint16 localAuthServerPort)
+LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin, quint16 localAuthServerPort)
 {
     updateRuntimeContext();
     auto process = LaunchTask::create(this);
