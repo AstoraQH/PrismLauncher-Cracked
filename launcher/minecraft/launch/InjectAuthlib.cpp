@@ -42,6 +42,7 @@ void InjectAuthlib::onVersionDownloadSucceeded()
         data = FS::read(QDir("injectors").absoluteFilePath("version.json"));
     } catch (const Exception& e) {
         qCritical() << "Translations Download Failed: index file not readable";
+        qCritical() << e.cause();
         jobPtr.reset();
         emitFailed("Error while parsing JSON response from InjectorEndpoint");
         return;
